@@ -9,9 +9,14 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Device/SaleaeLogic.pm', # retrieve abstract from module
        AUTHOR         => 'Vikas Kumar <vikas@selectiveintellect.com>') : ()),
-    LIBS              => [''], # e.g., '-lm'
+    LIBS              => ['-L. -lSaleaeDevice'], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:
-    # OBJECT            => '$(O_FILES)', # link all the C files too
+    OBJECT            => 'SaleaeLogic.o saleaeinterface.o', # link all the C files too
+    ### we are doing this so that the header files needed are downloaded first
+    #and the make file dependencies are managed appropriately
+    PL_FILES          => { 'getSDK.PL' => '$(H_FILES)' }
 );
+
+__END__
