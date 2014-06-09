@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+SaleaeLogic.xs
+t/Device-SaleaeLogic.t
+lib/Device/SaleaeLogic.pm
