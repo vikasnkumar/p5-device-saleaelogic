@@ -1,8 +1,13 @@
 Changes
+getSDK.PL
+lib/Device/SaleaeLogic.pm
+libSaleaeDevice.so
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 ppport.h
 README
+SaleaeDeviceApi.h
+saleaeinterface.cpp
 SaleaeLogic.xs
 t/Device-SaleaeLogic.t
-lib/Device/SaleaeLogic.pm

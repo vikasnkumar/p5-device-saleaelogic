@@ -42,9 +42,13 @@ foreach my $f (@files) {
         my $fname = $_->fileName();
         $fname = $1 if $fname =~ /\/([\.\w]+)$/;
         $fname =~ s/64\.so/\.so/g;
-        $zip->extractMemberWithoutPaths($_, $fname);
-        warn "Unable to extract $fname into $fname" unless -e $fname;
-        print "Extracted $fname from $zipfile\n" if -e $fname;
+        unless (-e $fname) {
+            $zip->extractMemberWithoutPaths($_, $fname);
+            warn "Unable to extract $fname into $fname" unless -e $fname;
+            print "Extracted $fname from $zipfile\n" if -e $fname;
+        } else {
+            print "$fname already exists. not extracting from $zipfile\n";
+        }
     }
     die "no member for $f" unless scalar @members;
 }

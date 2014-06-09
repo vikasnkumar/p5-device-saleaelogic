@@ -1,0 +1,14 @@
+MANIFEST.bak
+MYMETA.json
+MYMETA.yml
+Makefile
+SaleaeDeviceApi.h
+SaleaeLogic.bs
+SaleaeLogic.c
+SaleaeLogic.o
+_installer/
+blib/
+libSaleaeDevice.so
+pm_to_blib
+saleaeinterface.o
+saleaesdk.zip
