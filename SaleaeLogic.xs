@@ -210,3 +210,32 @@ void saleaeinterface_set_sample_rate(obj, hz)
         if (hz > 0) {
             saleaeinterface_setsamplerate(obj, hz);
         }
+
+SV *
+saleaeinterface_get_supported_sample_rates(obj)
+    saleaeinterface_t *obj
+    PREINIT:
+        AV *results;
+        unsigned int *buf = NULL;
+        size_t blen = 32;
+        size_t outlen = 0;
+        size_t i = 0;
+    CODE:
+        buf = malloc(blen * sizeof(unsigned int));
+        if (!buf) {
+            Perl_croak(aTHX_ "No memory to allocate 16 array of integers\n");
+            XSRETURN_UNDEF;
+        } else {
+            memset(buf, 0, blen * sizeof(unsigned int));
+        }
+        results = (AV *)sv_2mortal((SV *)newAV());
+        outlen = saleaeinterface_getsupportedsamplerates(obj, buf, blen);
+        for (i = 0; i < outlen && i < blen; ++i) {
+            av_push(results, newSVuv(buf[i]));
+        }
+        RETVAL = newRV_noinc((SV *)results);
+        if (buf) {
+            free(buf);
+        }
+    OUTPUT:
+       RETVAL

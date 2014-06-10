@@ -142,9 +142,23 @@ void saleaeinterface_setsamplerate(saleaeinterface_t *obj, unsigned int rate)
     if (obj) {
         GenericInterface *gi = (GenericInterface *)obj->interface;
         LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
-        return lai->SetSampleRateHz(rate);
+        lai->SetSampleRateHz(rate);
     }
+}
 
+size_t saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj,
+                            unsigned int *ptr, size_t len)
+{
+    if (obj && ptr) {
+        GenericInterface *gi = (GenericInterface *)obj->interface;
+        LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
+        S32 rc = lai->GetSupportedSampleRates(ptr, (U32)len);
+        if (rc < 0)
+            return 0;
+        else
+            return (size_t)rc;
+    }
+    return 0;
 }
 
 #ifdef __cplusplus

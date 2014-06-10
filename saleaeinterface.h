@@ -40,6 +40,9 @@ unsigned int saleaeinterface_isusb2(saleaeinterface_t *obj);
 unsigned int saleaeinterface_getchannelcount(saleaeinterface_t *obj);
 unsigned int saleaeinterface_getsamplerate(saleaeinterface_t *obj);
 void saleaeinterface_setsamplerate(saleaeinterface_t *obj, unsigned int rate);
+/* the user has to alloc the ptr variable and give it to the function */
+size_t saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj,
+                            unsigned int *ptr, size_t len);
 
 #ifdef __cplusplus
 } /* extern C end */

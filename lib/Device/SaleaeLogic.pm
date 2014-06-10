@@ -89,6 +89,10 @@ sub set_sample_rate {
     saleaeinterface_set_sample_rate($_[0]->{obj}, $_[1]);
 }
 
+sub get_supported_sample_rates {
+    return saleaeinterface_get_supported_sample_rates($_[0]->{obj});
+}
+
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
