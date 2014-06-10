@@ -63,6 +63,7 @@ void saleaeinterface_internal_on_writedata(saleaeinterface_t *obj,
     dSP;
     PUSHMARK(SP);
     if (obj && obj->parent && obj->on_writedata) {
+        /* FIXME: this is a wrong implementation */
         SV *psv = newSV(0);
         SvPVX(psv) = data;
         SvCUR(psv) = len;
@@ -168,4 +169,44 @@ saleaeinterface_DESTROY(obj)
         if (obj) {
             free(obj);
             obj = NULL;
+        }
+
+unsigned int
+saleaeinterface_is_usb2(obj)
+    saleaeinterface_t *obj
+    CODE:
+        RETVAL = saleaeinterface_isusb2(obj);
+    OUTPUT:
+        RETVAL
+
+unsigned int
+saleaeinterface_is_streaming(obj)
+    saleaeinterface_t *obj
+    CODE:
+        RETVAL = saleaeinterface_isstreaming(obj);
+    OUTPUT:
+        RETVAL
+
+unsigned int
+saleaeinterface_get_channel_count(obj)
+    saleaeinterface_t *obj
+    CODE:
+        RETVAL = saleaeinterface_getchannelcount(obj);
+    OUTPUT:
+        RETVAL
+
+unsigned int
+saleaeinterface_get_sample_rate(obj)
+    saleaeinterface_t *obj
+    CODE:
+        RETVAL = saleaeinterface_getsamplerate(obj);
+    OUTPUT:
+        RETVAL
+
+void saleaeinterface_set_sample_rate(obj, hz)
+    saleaeinterface_t *obj
+    unsigned int hz
+    CODE:
+        if (hz > 0) {
+            saleaeinterface_setsamplerate(obj, hz);
         }

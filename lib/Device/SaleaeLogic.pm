@@ -37,7 +37,9 @@ sub new {
 	my $self = shift;
 	my $class = ref($self) || $self;
     my %args = @_;
-    my $obj = saleaeinterface_new();
+    my $this = bless({%args}, $class);
+    my $obj = saleaeinterface_new($this);
+    $this->{obj} = $obj;
     if (exists $args{on_connect} and ref $args{on_connect} eq 'CODE') {
         saleaeinterface_register_on_connect($obj, $args{on_connect});
     }
@@ -56,19 +58,35 @@ sub new {
     if ($args{begin}) {
         saleaeinterface_begin_connect($obj);
     }
-	return bless({obj => $obj, %args}, $class);
+    return $this;
 }
 
 sub begin {
-    my $self = shift;
-    saleaeinterface_begin_connect($self->{obj}) if defined $self->{obj};
+    saleaeinterface_begin_connect($_[0]->{obj});
 }
 
 sub DESTROY {
-    my $self = shift;
-    if (defined $self->{obj}) {
-        saleaeinterface_DESTROY($self->{obj});
-    }
+    saleaeinterface_DESTROY($_[0]->{obj});
+}
+
+sub is_usb2 {
+    return saleaeinterface_is_usb2($_[0]->{obj});
+}
+
+sub is_streaming {
+    return saleaeinterface_is_streaming($_[0]->{obj});
+}
+
+sub get_channel_count {
+    return saleaeinterface_get_channel_count($_[0]->{obj});
+}
+
+sub get_sample_rate {
+    return saleaeinterface_get_sample_rate($_[0]->{obj});
+}
+
+sub set_sample_rate {
+    saleaeinterface_set_sample_rate($_[0]->{obj}, $_[1]);
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

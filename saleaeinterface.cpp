@@ -32,10 +32,13 @@ static void cb_onreaddata(U64 id, U8 *data, U32 len, void *udata)
 {
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
     saleaeinterface_internal_on_readdata(obj, data, len);
+    if (data)
+        DevicesManagerInterface::DeleteU8ArrayPtr(data);
 }
 static void cb_onwritedata(U64 id, U8 *data, U32 len, void *udata)
 {
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
+    /* FIXME: maybe wrong implementation */
     saleaeinterface_internal_on_writedata(obj, data, len);
 }
 static void cb_onerror(U64 id, void *udata)
@@ -92,6 +95,56 @@ void saleaeinterface_begin_connect(saleaeinterface_t *obj)
         DevicesManagerInterface::BeginConnect();
     }
     IAMHERE2;
+}
+
+unsigned int saleaeinterface_isusb2(saleaeinterface_t *obj)
+{
+    if (obj) {
+        GenericInterface *gi = (GenericInterface *)obj->interface;
+        LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
+        return lai->IsUsb2pt0() ? 1 : 0;
+    }
+    return 0;
+}
+
+unsigned int saleaeinterface_isstreaming(saleaeinterface_t *obj)
+{
+    if (obj) {
+        GenericInterface *gi = (GenericInterface *)obj->interface;
+        LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
+        return lai->IsStreaming() ? 1 : 0;
+    }
+    return 0;
+}
+
+unsigned int saleaeinterface_getchannelcount(saleaeinterface_t *obj)
+{
+    if (obj) {
+        GenericInterface *gi = (GenericInterface *)obj->interface;
+        LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
+        return lai->GetChannelCount();
+    }
+    return 0;
+}
+
+unsigned int saleaeinterface_getsamplerate(saleaeinterface_t *obj)
+{
+    if (obj) {
+        GenericInterface *gi = (GenericInterface *)obj->interface;
+        LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
+        return lai->GetSampleRateHz();
+    }
+    return 0;
+}
+
+void saleaeinterface_setsamplerate(saleaeinterface_t *obj, unsigned int rate)
+{
+    if (obj) {
+        GenericInterface *gi = (GenericInterface *)obj->interface;
+        LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
+        return lai->SetSampleRateHz(rate);
+    }
+
 }
 
 #ifdef __cplusplus

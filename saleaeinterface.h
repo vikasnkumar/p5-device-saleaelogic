@@ -35,6 +35,12 @@ void saleaeinterface_internal_on_readdata(saleaeinterface_t *obj,
 void saleaeinterface_internal_on_writedata(saleaeinterface_t *obj,
                     unsigned char *data, unsigned int len);
 
+unsigned int saleaeinterface_isstreaming(saleaeinterface_t *obj);
+unsigned int saleaeinterface_isusb2(saleaeinterface_t *obj);
+unsigned int saleaeinterface_getchannelcount(saleaeinterface_t *obj);
+unsigned int saleaeinterface_getsamplerate(saleaeinterface_t *obj);
+void saleaeinterface_setsamplerate(saleaeinterface_t *obj, unsigned int rate);
+
 #ifdef __cplusplus
 } /* extern C end */
 #endif /* __cplusplus */

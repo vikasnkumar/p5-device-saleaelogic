@@ -5,6 +5,11 @@ my $sl = new_ok('Device::SaleaeLogic');
 
 can_ok($sl, 'DESTROY');
 can_ok($sl, 'begin');
+can_ok($sl, 'get_channel_count');
+can_ok($sl, 'get_sample_rate');
+can_ok($sl, 'set_sample_rate');
+can_ok($sl, 'is_usb2');
+can_ok($sl, 'is_streaming');
 undef $sl;
 
 done_testing();
