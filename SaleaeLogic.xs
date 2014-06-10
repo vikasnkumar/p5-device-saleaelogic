@@ -230,8 +230,10 @@ saleaeinterface_get_supported_sample_rates(obj)
         }
         results = (AV *)sv_2mortal((SV *)newAV());
         outlen = saleaeinterface_getsupportedsamplerates(obj, buf, blen);
-        for (i = 0; i < outlen && i < blen; ++i) {
-            av_push(results, newSVuv(buf[i]));
+        if (outlen > 0) {
+            for (i = 0; i < outlen && i < blen; ++i) {
+                av_push(results, newSVuv(buf[i]));
+            }
         }
         RETVAL = newRV_noinc((SV *)results);
         if (buf) {
