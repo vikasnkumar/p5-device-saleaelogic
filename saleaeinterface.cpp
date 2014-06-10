@@ -83,6 +83,7 @@ static void cb_ondisconnect(U64 id, void *udata)
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
     IAMHERE1;
     saleaeinterface_internal_on_disconnect(obj);
+    IAMHERE2;
 }
 
 void saleaeinterface_begin_connect(saleaeinterface_t *obj)
@@ -146,17 +147,14 @@ void saleaeinterface_setsamplerate(saleaeinterface_t *obj, unsigned int rate)
     }
 }
 
-size_t saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj,
-                            unsigned int *ptr, size_t len)
+int saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj,
+                            unsigned int *ptr, unsigned int len)
 {
     if (obj && ptr) {
         GenericInterface *gi = (GenericInterface *)obj->interface;
         LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
         S32 rc = lai->GetSupportedSampleRates(ptr, (U32)len);
-        if (rc < 0)
-            return 0;
-        else
-            return (size_t)rc;
+        return (int)rc;
     }
     return 0;
 }

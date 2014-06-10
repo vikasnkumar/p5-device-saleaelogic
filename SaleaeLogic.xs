@@ -217,9 +217,9 @@ saleaeinterface_get_supported_sample_rates(obj)
     PREINIT:
         AV *results;
         unsigned int *buf = NULL;
-        size_t blen = 32;
-        size_t outlen = 0;
-        size_t i = 0;
+        unsigned int blen = 32;
+        int outlen = 0;
+        int i = 0;
     CODE:
         buf = malloc(blen * sizeof(unsigned int));
         if (!buf) {
