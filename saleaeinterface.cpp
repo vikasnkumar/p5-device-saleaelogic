@@ -1,5 +1,14 @@
 #ifdef WIN32
     #include <windows.h>
+    #ifndef __func__
+        #define __func__ __FUNCTION__
+    #endif
+    #ifndef _CRT_SECURE_NO_WARNINGS
+        #define _CRT_SECURE_NO_WARNINGS
+    #endif
+	#ifndef WIN32_LEAN_AND_MEAN
+		#define WIN32_LEAN_AND_MEAN
+	#endif
 #else
     #include <sys/select.h>
     #include <unistd.h>
@@ -129,9 +138,13 @@ void cb_onerror(U64 id, void *udata)
 
 #endif
 
+#define IAMHERE1 fprintf(stderr, "[%s:%d] Entering\n", __func__, __LINE__)
+#define IAMHERE2 fprintf(stderr, "[%s:%d] Exiting\n", __func__, __LINE__)
+
 saleaeinterface_t *saleaeinterface_new()
 {
     saleaeinterface_t *obj = NULL;
+    IAMHERE1;
     obj = (saleaeinterface_t *)malloc(sizeof(*obj));
     if (obj) {
         obj->itype = saleaeinterface_t::UNKNOWN;
@@ -140,20 +153,25 @@ saleaeinterface_t *saleaeinterface_new()
         fprintf(stderr, "[%s:%d]Unable to allocate object\n",
                 __func__, __LINE__);
     }
+    IAMHERE2;
     return obj;
 }
 
 void saleaeinterface_DESTROY(saleaeinterface_t *obj)
 {
+    IAMHERE1;
     if (obj) {
         free(obj);
         obj = NULL;
     }
+    IAMHERE2;
 }
 
 void saleaeinterface_begin_connect()
 {
+    IAMHERE1;
     DevicesManagerInterface::BeginConnect();
+    IAMHERE2;
 }
 
 void saleaeinterface_register_on_connect(saleaeinterface_t *obj)
