@@ -9,5 +9,7 @@ ppport.h
 README
 SaleaeDeviceApi.h
 saleaeinterface.cpp
+saleaeinterface.h
 SaleaeLogic.xs
 t/Device-SaleaeLogic.t
+typemap

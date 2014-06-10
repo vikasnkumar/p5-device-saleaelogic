@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Device::SaleaeLogic',
     VERSION_FROM      => 'lib/Device/SaleaeLogic.pm', # finds $VERSION
+    LICENSE           => 'perl',
     PREREQ_PM         => {
       'LWP::Simple'   => 0,
       'Archive::Zip'  => 0,
@@ -19,7 +20,7 @@ WriteMakefile(
     OBJECT            => 'SaleaeLogic.o saleaeinterface.o', # link all the C files too
     ### we are doing this so that the header files needed are downloaded first
     #and the make file dependencies are managed appropriately
-    PL_FILES          => { 'getSDK.PL' => '$(H_FILES)' }
+    PL_FILES          => { 'getSDK.PL' => 'SaleaeDeviceApi.h' }
 );
 
 __END__

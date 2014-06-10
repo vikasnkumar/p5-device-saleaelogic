@@ -23,15 +23,15 @@ sub get_header_name {
 
 my $url = "http://downloads.saleae.com/SDK/SaleaeDeviceSdk-$SDKVER.zip";
 my $zipfile = 'saleaesdk.zip';
-print "Downloading $url into $zipfile\n";
+print "Downloading $url into $zipfile\n" if $ENV{DEBUG};
 unless (-e $zipfile) {
     my $rc = getstore($url, $zipfile);
     die "Unable to download SDK from $url" unless is_success($rc);
 } else {
-    print "$zipfile already exists, so skipping the download\n";
+    print "$zipfile already exists, so skipping the download\n" if $ENV{DEBUG};
 }
 
-print "Unzipping $zipfile and finding the required files\n";
+print "Unzipping $zipfile and finding the required files\n" if $ENV{DEBUG};
 my $zip = Archive::Zip->new;
 die "Unable to unzip downloaded SDK $zipfile" unless ($zip->read($zipfile) == AZ_OK);
 my @files = get_lib_names();
@@ -45,9 +45,12 @@ foreach my $f (@files) {
         unless (-e $fname) {
             $zip->extractMemberWithoutPaths($_, $fname);
             warn "Unable to extract $fname into $fname" unless -e $fname;
-            print "Extracted $fname from $zipfile\n" if -e $fname;
+            if ($ENV{DEBUG} and -e $fname) {
+                print "Extracted $fname from $zipfile\n";
+            }
         } else {
-            print "$fname already exists. not extracting from $zipfile\n";
+            print "$fname already exists. not extracting from $zipfile\n" if
+            $ENV{DEBUG};
         }
     }
     die "no member for $f" unless scalar @members;

@@ -12,3 +12,6 @@ libSaleaeDevice.so
 pm_to_blib
 saleaeinterface.o
 saleaesdk.zip
+*.bak
+*.old
+

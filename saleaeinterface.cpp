@@ -4,11 +4,15 @@
     #include <sys/select.h>
     #include <unistd.h>
 #endif
-#include <iostream>
-#include <typeinfo>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "SaleaeDeviceApi.h"
+#include "saleaeinterface.h"
 
+#if 0
+#include <iostream>
+#include <typeinfo>
 #define LOG std::cerr << "[" << __func__ << ":" << __LINE__ << "]"
 
 typedef enum {
@@ -121,6 +125,55 @@ void cb_onerror(U64 id, void *udata)
         lu->error = true;
         LOG << "Whoa! Error!!\n";
     }
+}
+
+#endif
+
+saleaeinterface_t *saleaeinterface_new()
+{
+    saleaeinterface_t *obj = NULL;
+    obj = (saleaeinterface_t *)malloc(sizeof(*obj));
+    if (obj) {
+        obj->itype = saleaeinterface_t::UNKNOWN;
+        obj->ptr = NULL;
+    } else {
+        fprintf(stderr, "[%s:%d]Unable to allocate object\n",
+                __func__, __LINE__);
+    }
+    return obj;
+}
+
+void saleaeinterface_DESTROY(saleaeinterface_t *obj)
+{
+    if (obj) {
+        free(obj);
+        obj = NULL;
+    }
+}
+
+void saleaeinterface_begin_connect()
+{
+    DevicesManagerInterface::BeginConnect();
+}
+
+void saleaeinterface_register_on_connect(saleaeinterface_t *obj)
+{
+}
+
+void saleaeinterface_register_on_disconnect(saleaeinterface_t *obj)
+{
+}
+
+void saleaeinterface_register_on_readdata(saleaeinterface_t *obj)
+{
+}
+
+void saleaeinterface_register_on_writedata(saleaeinterface_t *obj)
+{
+}
+
+void saleaeinterface_register_on_error(saleaeinterface_t *obj)
+{
 }
 
 #if 0

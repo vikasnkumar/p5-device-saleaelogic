@@ -33,6 +33,20 @@ XSLoader::load('Device::SaleaeLogic', $VERSION);
 
 # Preloaded methods go here.
 
+sub new {
+	my $self = shift;
+	my $class = ref($self) || $self;
+    my $obj = saleaeinterface_new();
+	return bless({obj => $obj, @_}, $class);
+}
+
+sub DESTROY {
+    my $self = shift;
+    if (defined $self->{obj}) {
+        saleaeinterface_DESTROY($self->{obj});
+    }
+}
+
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
