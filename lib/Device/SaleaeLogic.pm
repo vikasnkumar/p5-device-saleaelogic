@@ -36,8 +36,32 @@ XSLoader::load('Device::SaleaeLogic', $VERSION);
 sub new {
 	my $self = shift;
 	my $class = ref($self) || $self;
+    my %args = @_;
     my $obj = saleaeinterface_new();
-	return bless({obj => $obj, @_}, $class);
+    if (exists $args{on_connect} and ref $args{on_connect} eq 'CODE') {
+        saleaeinterface_register_on_connect($obj, $args{on_connect});
+    }
+    if (exists $args{on_disconnect} and ref $args{on_disconnect} eq 'CODE') {
+        saleaeinterface_register_on_disconnect($obj, $args{on_disconnect});
+    }
+    if (exists $args{on_readdata} and ref $args{on_readdata} eq 'CODE') {
+        saleaeinterface_register_on_readdata($obj, $args{on_readdata});
+    }
+    if (exists $args{on_writedata} and ref $args{on_writedata} eq 'CODE') {
+        saleaeinterface_register_on_writedata($obj, $args{on_writedata});
+    }
+    if (exists $args{on_error} and ref $args{on_error} eq 'CODE') {
+        saleaeinterface_register_on_error($obj, $args{on_error});
+    }
+    if ($args{begin}) {
+        saleaeinterface_begin_connect($obj);
+    }
+	return bless({obj => $obj, %args}, $class);
+}
+
+sub begin {
+    my $self = shift;
+    saleaeinterface_begin_connect($self->{obj}) if defined $self->{obj};
 }
 
 sub DESTROY {
