@@ -45,8 +45,14 @@ void saleaeinterface_internal_on_readdata(saleaeinterface_t *obj,
     dSP;
     PUSHMARK(SP);
     if (obj && obj->parent && obj->on_readdata) {
+        SV *psv = newSV(0);
+        SvPVX(psv) = data;
+        SvCUR(psv) = len;
+        SvLEN(psv) = 0;
         XPUSHs((SV *)obj->parent);
         XPUSHs(sv_2mortal(newSVuv(obj->device_id)));
+        XPUSHs(psv);
+        XPUSHs(sv_2mortal(newSVuv(len)));
         PUTBACK;
         call_sv((SV *)obj->on_readdata, G_DISCARD);
     }
@@ -57,8 +63,14 @@ void saleaeinterface_internal_on_writedata(saleaeinterface_t *obj,
     dSP;
     PUSHMARK(SP);
     if (obj && obj->parent && obj->on_writedata) {
+        SV *psv = newSV(0);
+        SvPVX(psv) = data;
+        SvCUR(psv) = len;
+        SvLEN(psv) = 0;
         XPUSHs((SV *)obj->parent);
         XPUSHs(sv_2mortal(newSVuv(obj->device_id)));
+        XPUSHs(psv);
+        XPUSHs(sv_2mortal(newSVuv(len)));
         PUTBACK;
         call_sv((SV *)obj->on_writedata, G_DISCARD);
     }
