@@ -282,7 +282,7 @@ saleaeinterface_get_sdk_id(obj, id)
             char *sdk_id = malloc((sdk_len + 1) * sizeof(unsigned char));
             if (sdk_id) {
                 memset(sdk_id, 0, (sdk_len + 1) * sizeof(unsigned char));
-                sdk_len = saleaeinterface_get_sdk_id(obj, id, sdk_id, sdk_len);
+                sdk_len = saleaeinterface_get_sdk_id(obj, id, sdk_id, sdk_len + 1);
                 if (sdk_len > 0) {
                     RETVAL = sv_2mortal((SV *)newSVpvn(sdk_id, sdk_len));
                 }

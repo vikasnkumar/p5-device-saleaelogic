@@ -34,6 +34,7 @@ typedef std::pair <U64, GenericInterface *> SIPair;
 typedef std::map <U64, unsigned int> SIDMap;
 typedef std::pair <U64, unsigned int> SIDPair;
 
+static unsigned int saleaeinterface_runtime_device_count = 0;
 /* interface for XS to call */
 void *saleaeinterface_map_create()
 {
@@ -76,7 +77,7 @@ static void saleaeinterface_map_insert(void *p, U64 id, GenericInterface *iface)
     }
 }
 
-static void saleaeinterface_id_map_insert(void *p, U64 id)
+static void saleaeinterface_id_map_insert(void *p, U64 id, unsigned int val)
 {
     if (p) {
         SIDMap *m = (SIDMap *)p;
@@ -85,7 +86,6 @@ static void saleaeinterface_id_map_insert(void *p, U64 id)
         if (mi != m->end()) {
             m->erase(mi);
         }
-        unsigned int val = (unsigned int)m->size() + 1;
         m->insert(SIDPair(id, val));
     }
 }
@@ -215,7 +215,9 @@ static void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
         int type = saleaeinterface_get_type(iface);
         /* setup the interface and device id */
         saleaeinterface_map_insert(obj->interface_map, id, iface);
-        saleaeinterface_id_map_insert(obj->id_map, id);
+        saleaeinterface_runtime_device_count++;
+        saleaeinterface_id_map_insert(obj->id_map, id,
+                saleaeinterface_runtime_device_count);
         obj->interface_count = saleaeinterface_map_size(obj->interface_map);
         if (type == SALEAEINTERFACE_LOGIC16) {
             Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(iface);
