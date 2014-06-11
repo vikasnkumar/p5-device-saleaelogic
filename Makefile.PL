@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Device::SaleaeLogic',
     VERSION_FROM      => 'lib/Device/SaleaeLogic.pm', # finds $VERSION
-    LICENSE           => 'perl',
+    LICENSE           => 'mit',
     PREREQ_PM         => {
       'LWP::Simple'   => 0,
       'Archive::Zip'  => 0,
