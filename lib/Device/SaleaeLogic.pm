@@ -42,23 +42,18 @@ sub new {
     $this->{obj} = $obj;
     if (exists $args{on_connect} and ref $args{on_connect} eq 'CODE') {
         saleaeinterface_register_on_connect($obj, $args{on_connect});
-        print STDERR "registering on_connect\n";
     }
     if (exists $args{on_disconnect} and ref $args{on_disconnect} eq 'CODE') {
         saleaeinterface_register_on_disconnect($obj, $args{on_disconnect});
-        print STDERR "registering on_disconnect\n";
     }
     if (exists $args{on_readdata} and ref $args{on_readdata} eq 'CODE') {
         saleaeinterface_register_on_readdata($obj, $args{on_readdata});
-        print STDERR "registering on_readdata\n";
     }
     if (exists $args{on_writedata} and ref $args{on_writedata} eq 'CODE') {
         saleaeinterface_register_on_writedata($obj, $args{on_writedata});
-        print STDERR "registering on_writedata\n";
     }
     if (exists $args{on_error} and ref $args{on_error} eq 'CODE') {
         saleaeinterface_register_on_error($obj, $args{on_error});
-        print STDERR "registering on_error\n";
     }
     if ($args{begin}) {
         saleaeinterface_begin_connect($obj);
@@ -107,11 +102,11 @@ sub is_logic16 {
 }
 
 sub is_logic {
-    return saleaeinterface_is_logic16($_[0]->{obj}, $_[1]);
+    return saleaeinterface_is_logic($_[0]->{obj}, $_[1]);
 }
 
 sub get_device_id {
-    return saleaeinterface_sdk_id($_[0]->{obj}, $_[1]);
+    return saleaeinterface_get_device_id($_[0]->{obj}, $_[1]);
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

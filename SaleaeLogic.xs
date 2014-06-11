@@ -284,10 +284,11 @@ saleaeinterface_get_supported_sample_rates(obj, id)
         } else {
             memset(buf, 0, blen * sizeof(unsigned int));
         }
-        results = (AV *)sv_2mortal((SV *)newAV());
+        results = newAV();
         outlen = saleaeinterface_getsupportedsamplerates(obj, id, buf, blen);
         if (outlen > 0) {
             for (i = 0; i < outlen && i < blen; ++i) {
+                fprintf(stderr, "[%s:%d] sample[%d]: %u\n", __func__, __LINE__, i, buf[i]);
                 av_push(results, newSVuv(buf[i]));
             }
         }
@@ -317,7 +318,7 @@ saleaeinterface_is_logic(obj, id)
         RETVAL
 
 SV*
-saleaeinterface_get_sdk_id(obj, id)
+saleaeinterface_get_device_id(obj, id)
     saleaeinterface_t *obj
     unsigned int id
     PREINIT:
@@ -330,7 +331,7 @@ saleaeinterface_get_sdk_id(obj, id)
                 memset(sdk_id, 0, (sdk_len + 1) * sizeof(unsigned char));
                 sdk_len = saleaeinterface_get_sdk_id(obj, id, sdk_id, sdk_len + 1);
                 if (sdk_len > 0) {
-                    RETVAL = sv_2mortal((SV *)newSVpvn(sdk_id, sdk_len));
+                    RETVAL = newSVpv(sdk_id, (STRLEN)sdk_len);
                 }
                 free(sdk_id);
             } else {
