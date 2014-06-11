@@ -18,6 +18,7 @@
 #include <string>
 #include <typeinfo>
 #include <map>
+#include <sstream>
 
 #include "SaleaeDeviceApi.h"
 #include "saleaeinterface.h"
@@ -30,6 +31,8 @@ extern "C" {
 #define IAMHERE2 fprintf(stderr, "[%s:%d] Exiting\n", __func__, __LINE__)
 typedef std::map <U64, GenericInterface *> SIMap;
 typedef std::pair <U64, GenericInterface *> SIPair;
+typedef std::map <U64, unsigned int> SIDMap;
+typedef std::pair <U64, unsigned int> SIDPair;
 
 /* interface for XS to call */
 void *saleaeinterface_map_create()
@@ -38,10 +41,24 @@ void *saleaeinterface_map_create()
     return (void *)p;
 }
 
+void *saleaeinterface_id_map_create()
+{
+    SIDMap *p = new SIDMap;
+    return (void *)p;
+}
+
 void saleaeinterface_map_delete(void *p)
 {
     if (p) {
         SIMap *m = (SIMap *)p;
+        delete m;
+    }
+}
+
+void saleaeinterface_id_map_delete(void *p)
+{
+    if (p) {
+        SIDMap *m = (SIDMap *)p;
         delete m;
     }
 }
@@ -59,11 +76,36 @@ static void saleaeinterface_map_insert(void *p, U64 id, GenericInterface *iface)
     }
 }
 
+static void saleaeinterface_id_map_insert(void *p, U64 id)
+{
+    if (p) {
+        SIDMap *m = (SIDMap *)p;
+        SIDMap::iterator mi = m->find(id);
+        /* force insertion */
+        if (mi != m->end()) {
+            m->erase(mi);
+        }
+        unsigned int val = (unsigned int)m->size() + 1;
+        m->insert(SIDPair(id, val));
+    }
+}
+
 static void saleaeinterface_map_erase(void *p, U64 id)
 {
     if (p) {
         SIMap *m = (SIMap *)p;
         SIMap::iterator mi = m->find(id);
+        if (mi != m->end()) {
+            m->erase(mi);
+        }
+    }
+}
+
+static void saleaeinterface_id_map_erase(void *p, U64 id)
+{
+    if (p) {
+        SIDMap *m = (SIDMap *)p;
+        SIDMap::iterator mi = m->find(id);
         if (mi != m->end()) {
             m->erase(mi);
         }
@@ -79,6 +121,15 @@ static size_t saleaeinterface_map_size(void *p)
     return 0;
 }
 
+static size_t saleaeinterface_id_map_size(void *p)
+{
+    if (p) {
+        SIDMap *m = (SIDMap *)p;
+        return m->size();
+    }
+    return 0;
+}
+
 static GenericInterface *saleaeinterface_map_get(void *p, U64 id)
 {
     if (p) {
@@ -88,6 +139,30 @@ static GenericInterface *saleaeinterface_map_get(void *p, U64 id)
             return mi->second;
     }
     return NULL;
+}
+
+static unsigned int saleaeinterface_id_map_get(void *p, U64 id)
+{
+    if (p) {
+        SIDMap *m = (SIDMap *)p;
+        SIDMap::iterator mi = m->find(id);
+        if (mi != m->end())
+            return mi->second;
+    }
+    return 0;
+}
+
+static U64 saleaeinterface_id_map_get_id(void *p, unsigned int val)
+{
+    if (p) {
+        SIDMap *m = (SIDMap *)p;
+        SIDMap::iterator mi;
+        for (mi = m->begin(); mi != m->end(); mi++) {
+            if (mi->second == val)
+                return mi->first;
+        }
+    }
+    return 0;
 }
 
 static int saleaeinterface_get_type(GenericInterface *iface)
@@ -108,7 +183,10 @@ static int saleaeinterface_get_type(GenericInterface *iface)
 static void cb_onreaddata(U64 id, U8 *data, U32 len, void *udata)
 {
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
-    saleaeinterface_internal_on_readdata(obj, id, data, len);
+    if (obj) {
+        unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
+        saleaeinterface_internal_on_readdata(obj, val, data, len);
+    }
     if (data)
         DevicesManagerInterface::DeleteU8ArrayPtr(data);
 }
@@ -116,12 +194,18 @@ static void cb_onwritedata(U64 id, U8 *data, U32 len, void *udata)
 {
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
     /* FIXME: maybe wrong implementation */
-    saleaeinterface_internal_on_writedata(obj, id, data, len);
+    if (obj) {
+        unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
+        saleaeinterface_internal_on_writedata(obj, val, data, len);
+    }
 }
 static void cb_onerror(U64 id, void *udata)
 {
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
-    saleaeinterface_internal_on_error(obj, id);
+    if (obj) {
+        unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
+        saleaeinterface_internal_on_error(obj, val);
+    }
 }
 static void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
 {
@@ -131,6 +215,7 @@ static void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
         int type = saleaeinterface_get_type(iface);
         /* setup the interface and device id */
         saleaeinterface_map_insert(obj->interface_map, id, iface);
+        saleaeinterface_id_map_insert(obj->id_map, id);
         obj->interface_count = saleaeinterface_map_size(obj->interface_map);
         if (type == SALEAEINTERFACE_LOGIC16) {
             Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(iface);
@@ -147,7 +232,8 @@ static void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
                     __func__, __LINE__);
             return;
         }
-        saleaeinterface_internal_on_connect(obj, id);
+        unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
+        saleaeinterface_internal_on_connect(obj, val);
     }
     IAMHERE2;
 }
@@ -156,8 +242,10 @@ static void cb_ondisconnect(U64 id, void *udata)
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
     IAMHERE1;
     saleaeinterface_map_erase(obj->interface_map, id);
+    saleaeinterface_id_map_erase(obj->interface_map, id);
     obj->interface_count = saleaeinterface_map_size(obj->interface_map);
-    saleaeinterface_internal_on_disconnect(obj, id);
+    unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
+    saleaeinterface_internal_on_disconnect(obj, val);
     IAMHERE2;
 }
 
@@ -173,10 +261,11 @@ void saleaeinterface_begin_connect(saleaeinterface_t *obj)
     IAMHERE2;
 }
 
-unsigned int saleaeinterface_isusb2(saleaeinterface_t *obj, U64 id)
+unsigned int saleaeinterface_isusb2(saleaeinterface_t *obj, unsigned int id)
 {
     if (obj) {
-        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
         if (gi) {
             LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
             return lai->IsUsb2pt0() ? 1 : 0;
@@ -185,10 +274,11 @@ unsigned int saleaeinterface_isusb2(saleaeinterface_t *obj, U64 id)
     return 0;
 }
 
-unsigned int saleaeinterface_isstreaming(saleaeinterface_t *obj, U64 id)
+unsigned int saleaeinterface_isstreaming(saleaeinterface_t *obj, unsigned int id)
 {
     if (obj) {
-        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
         if (gi) {
             LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
             return lai->IsStreaming() ? 1 : 0;
@@ -197,10 +287,11 @@ unsigned int saleaeinterface_isstreaming(saleaeinterface_t *obj, U64 id)
     return 0;
 }
 
-unsigned int saleaeinterface_getchannelcount(saleaeinterface_t *obj, U64 id)
+unsigned int saleaeinterface_getchannelcount(saleaeinterface_t *obj, unsigned int id)
 {
     if (obj) {
-        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
         if (gi) {
             LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
             return lai->GetChannelCount();
@@ -209,10 +300,11 @@ unsigned int saleaeinterface_getchannelcount(saleaeinterface_t *obj, U64 id)
     return 0;
 }
 
-unsigned int saleaeinterface_getsamplerate(saleaeinterface_t *obj, U64 id)
+unsigned int saleaeinterface_getsamplerate(saleaeinterface_t *obj, unsigned int id)
 {
     if (obj) {
-        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
         if (gi) {
             LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
             return lai->GetSampleRateHz();
@@ -221,10 +313,11 @@ unsigned int saleaeinterface_getsamplerate(saleaeinterface_t *obj, U64 id)
     return 0;
 }
 
-void saleaeinterface_setsamplerate(saleaeinterface_t *obj, U64 id, unsigned int rate)
+void saleaeinterface_setsamplerate(saleaeinterface_t *obj, unsigned int id, unsigned int rate)
 {
     if (obj) {
-        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
         if (gi) {
             LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
             lai->SetSampleRateHz(rate);
@@ -232,11 +325,12 @@ void saleaeinterface_setsamplerate(saleaeinterface_t *obj, U64 id, unsigned int 
     }
 }
 
-int saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj, U64 id,
+int saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj, unsigned int id,
                             unsigned int *ptr, unsigned int len)
 {
     if (obj && ptr) {
-        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
         if (gi) {
             LogicAnalyzerInterface *lai = dynamic_cast<LogicAnalyzerInterface *>(gi);
             S32 rc = lai->GetSupportedSampleRates(ptr, (U32)len);
@@ -246,10 +340,11 @@ int saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj, U64 id,
     return 0;
 }
 
-unsigned int saleaeinterface_islogic16(saleaeinterface_t *obj, ID64 id)
+unsigned int saleaeinterface_islogic16(saleaeinterface_t *obj, unsigned int id)
 {
     if (obj) {
-        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
         if (gi) {
             int type = saleaeinterface_get_type(gi);
             return (type == SALEAEINTERFACE_LOGIC16) ? 1 : 0;
@@ -258,16 +353,39 @@ unsigned int saleaeinterface_islogic16(saleaeinterface_t *obj, ID64 id)
     return 0;
 }
 
-unsigned int saleaeinterface_islogic(saleaeinterface_t *obj, ID64 id)
+unsigned int saleaeinterface_islogic(saleaeinterface_t *obj, unsigned int id)
 {
     if (obj) {
-        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
         if (gi) {
             int type = saleaeinterface_get_type(gi);
             return (type == SALEAEINTERFACE_LOGIC) ? 1 : 0;
         }
     }
     return 0;
+}
+
+size_t saleaeinterface_get_sdk_id(saleaeinterface_t *obj, unsigned int id,
+            char *buf, size_t buflen)
+{
+    U64 did = 0;
+    if (obj) {
+        did = saleaeinterface_id_map_get_id(obj->id_map, id);
+    }
+    std::stringstream ss;
+    ss << std::hex << did;
+    const std::string &str = ss.str();
+    if (buf && buflen > 0) {
+        const char *p = str.c_str();
+        size_t len = str.length();
+        if (len >= buflen)
+            len = buflen;
+        memset(buf, 0, buflen);
+        memcpy(buf, p, len);
+        return len;
+    }
+    return str.length();
 }
 
 #ifdef __cplusplus

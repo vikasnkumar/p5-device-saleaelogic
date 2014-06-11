@@ -6,7 +6,7 @@
 
 #include "saleaeinterface.h"
 
-void saleaeinterface_internal_on_connect(saleaeinterface_t *obj, ID64 id)
+void saleaeinterface_internal_on_connect(saleaeinterface_t *obj, unsigned int id)
 {
     dSP;
     PUSHMARK(SP);
@@ -17,7 +17,7 @@ void saleaeinterface_internal_on_connect(saleaeinterface_t *obj, ID64 id)
         call_sv((SV *)obj->on_connect, G_DISCARD);
     }
 }
-void saleaeinterface_internal_on_disconnect(saleaeinterface_t *obj, ID64 id)
+void saleaeinterface_internal_on_disconnect(saleaeinterface_t *obj, unsigned int id)
 {
     dSP;
     PUSHMARK(SP);
@@ -28,7 +28,7 @@ void saleaeinterface_internal_on_disconnect(saleaeinterface_t *obj, ID64 id)
         call_sv((SV *)obj->on_disconnect, G_DISCARD);
     }
 }
-void saleaeinterface_internal_on_error(saleaeinterface_t *obj, ID64 id)
+void saleaeinterface_internal_on_error(saleaeinterface_t *obj, unsigned int id)
 {
     dSP;
     PUSHMARK(SP);
@@ -39,7 +39,7 @@ void saleaeinterface_internal_on_error(saleaeinterface_t *obj, ID64 id)
         call_sv((SV *)obj->on_error, G_DISCARD);
     }
 }
-void saleaeinterface_internal_on_readdata(saleaeinterface_t *obj, ID64 id,
+void saleaeinterface_internal_on_readdata(saleaeinterface_t *obj, unsigned int id,
                     unsigned char *data, unsigned int len)
 {
     dSP;
@@ -57,7 +57,7 @@ void saleaeinterface_internal_on_readdata(saleaeinterface_t *obj, ID64 id,
         call_sv((SV *)obj->on_readdata, G_DISCARD);
     }
 }
-void saleaeinterface_internal_on_writedata(saleaeinterface_t *obj, ID64 id,
+void saleaeinterface_internal_on_writedata(saleaeinterface_t *obj, unsigned int id,
                     unsigned char *data, unsigned int len)
 {
     dSP;
@@ -155,6 +155,7 @@ saleaeinterface_new(parent)
             RETVAL->begun = 0;
             RETVAL->interface_count = 0;
             RETVAL->interface_map = saleaeinterface_map_create();
+            RETVAL->id_map = saleaeinterface_id_map_create();
             /* make a reference to the parent calling object */
             RETVAL->parent = newSVsv(parent);
         } else {
@@ -169,6 +170,7 @@ saleaeinterface_DESTROY(obj)
     CODE:
         if (obj) {
             saleaeinterface_map_delete(obj->interface_map);
+            saleaeinterface_id_map_delete(obj->id_map);
             free(obj);
             obj = NULL;
         }
@@ -176,7 +178,7 @@ saleaeinterface_DESTROY(obj)
 unsigned int
 saleaeinterface_is_usb2(obj, id)
     saleaeinterface_t *obj
-    ID64 id
+    unsigned int id
     CODE:
         RETVAL = saleaeinterface_isusb2(obj, id);
     OUTPUT:
@@ -185,7 +187,7 @@ saleaeinterface_is_usb2(obj, id)
 unsigned int
 saleaeinterface_is_streaming(obj, id)
     saleaeinterface_t *obj
-    ID64 id
+    unsigned int id
     CODE:
         RETVAL = saleaeinterface_isstreaming(obj, id);
     OUTPUT:
@@ -194,7 +196,7 @@ saleaeinterface_is_streaming(obj, id)
 unsigned int
 saleaeinterface_get_channel_count(obj, id)
     saleaeinterface_t *obj
-    ID64 id
+    unsigned int id
     CODE:
         RETVAL = saleaeinterface_getchannelcount(obj, id);
     OUTPUT:
@@ -203,7 +205,7 @@ saleaeinterface_get_channel_count(obj, id)
 unsigned int
 saleaeinterface_get_sample_rate(obj, id)
     saleaeinterface_t *obj
-    ID64 id
+    unsigned int id
     CODE:
         RETVAL = saleaeinterface_getsamplerate(obj, id);
     OUTPUT:
@@ -211,7 +213,7 @@ saleaeinterface_get_sample_rate(obj, id)
 
 void saleaeinterface_set_sample_rate(obj, id, hz)
     saleaeinterface_t *obj
-    ID64 id
+    unsigned int id
     unsigned int hz
     CODE:
         if (hz > 0) {
@@ -221,7 +223,7 @@ void saleaeinterface_set_sample_rate(obj, id, hz)
 SV *
 saleaeinterface_get_supported_sample_rates(obj, id)
     saleaeinterface_t *obj
-    ID64 id
+    unsigned int id
     PREINIT:
         AV *results;
         unsigned int *buf = NULL;
@@ -253,7 +255,7 @@ saleaeinterface_get_supported_sample_rates(obj, id)
 unsigned int
 saleaeinterface_is_logic16(obj, id)
     saleaeinterface_t *obj
-    ID64 id
+    unsigned int id
     CODE:
         RETVAL = saleaeinterface_islogic16(obj, id);
     OUTPUT:
@@ -262,8 +264,34 @@ saleaeinterface_is_logic16(obj, id)
 unsigned int
 saleaeinterface_is_logic(obj, id)
     saleaeinterface_t *obj
-    ID64 id
+    unsigned int id
     CODE:
         RETVAL = saleaeinterface_islogic(obj, id);
+    OUTPUT:
+        RETVAL
+
+SV*
+saleaeinterface_get_sdk_id(obj, id)
+    saleaeinterface_t *obj
+    unsigned int id
+    PREINIT:
+        size_t sdk_len;
+    CODE:
+        sdk_len = saleaeinterface_get_sdk_id(obj, id, NULL, 0);
+        if (sdk_len > 0) {
+            char *sdk_id = malloc((sdk_len + 1) * sizeof(unsigned char));
+            if (sdk_id) {
+                memset(sdk_id, 0, (sdk_len + 1) * sizeof(unsigned char));
+                sdk_len = saleaeinterface_get_sdk_id(obj, id, sdk_id, sdk_len);
+                if (sdk_len > 0) {
+                    RETVAL = sv_2mortal((SV *)newSVpvn(sdk_id, sdk_len));
+                }
+                free(sdk_id);
+            } else {
+                Perl_croak(aTHX_ "No memory to allocate string\n");
+            }
+        } else {
+            XSRETURN_UNDEF;
+        }
     OUTPUT:
         RETVAL

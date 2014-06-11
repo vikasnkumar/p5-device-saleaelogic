@@ -101,6 +101,10 @@ sub is_logic {
     return saleaeinterface_is_logic16($_[0]->{obj}, $_[1]);
 }
 
+sub get_sdk_id {
+    return saleaeinterface_sdk_id($_[0]->{obj}, $_[1]);
+}
+
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
