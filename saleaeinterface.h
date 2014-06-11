@@ -56,6 +56,9 @@ int saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj, unsigned int
 size_t saleaeinterface_get_sdk_id(saleaeinterface_t *obj, unsigned int id,
             char *buf, size_t buflen);
 
+#define IAMHERE_ENTRY fprintf(stderr, "[%s:%d] Entering function\n", __func__, __LINE__)
+#define IAMHERE_EXIT fprintf(stderr, "[%s:%d] Exiting function\n", __func__, __LINE__)
+
 #ifdef __cplusplus
 } /* extern C end */
 #endif /* __cplusplus */

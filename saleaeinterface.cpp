@@ -27,8 +27,6 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define IAMHERE1 fprintf(stderr, "[%s:%d] Entering\n", __func__, __LINE__)
-#define IAMHERE2 fprintf(stderr, "[%s:%d] Exiting\n", __func__, __LINE__)
 typedef std::map <U64, GenericInterface *> SIMap;
 typedef std::pair <U64, GenericInterface *> SIPair;
 typedef std::map <U64, unsigned int> SIDMap;
@@ -210,7 +208,7 @@ static void cb_onerror(U64 id, void *udata)
 void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
 {
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
-    IAMHERE1;
+    IAMHERE_ENTRY;
     if (obj && iface) {
         int type = saleaeinterface_get_type(iface);
         /* setup the interface and device id */
@@ -234,7 +232,7 @@ void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
         } else {
             fprintf(stderr, "[%s:%d] This is an unsupported device\n",
                     __func__, __LINE__);
-            IAMHERE2;
+            IAMHERE_EXIT;
             return;
         }
         unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
@@ -242,30 +240,30 @@ void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
                 __func__, __LINE__, id, val);
         saleaeinterface_internal_on_connect(obj, val);
     }
-    IAMHERE2;
+    IAMHERE_EXIT;
 }
 static void cb_ondisconnect(U64 id, void *udata)
 {
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
-    IAMHERE1;
+    IAMHERE_ENTRY;
     saleaeinterface_map_erase(obj->interface_map, id);
     saleaeinterface_id_map_erase(obj->interface_map, id);
     obj->interface_count = saleaeinterface_map_size(obj->interface_map);
     unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
     saleaeinterface_internal_on_disconnect(obj, val);
-    IAMHERE2;
+    IAMHERE_EXIT;
 }
 
 void saleaeinterface_begin_connect(saleaeinterface_t *obj)
 {
-    IAMHERE1;
+    IAMHERE_ENTRY;
     if (obj && !obj->begun) {
         obj->begun = 1;
         DevicesManagerInterface::RegisterOnConnect(cb_onconnect, (void *)obj);
         DevicesManagerInterface::RegisterOnDisconnect(cb_ondisconnect, (void *)obj);
         DevicesManagerInterface::BeginConnect();
     }
-    IAMHERE2;
+    IAMHERE_EXIT;
 }
 
 unsigned int saleaeinterface_isusb2(saleaeinterface_t *obj, unsigned int id)

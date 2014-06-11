@@ -5,8 +5,6 @@
 #include "ppport.h"
 
 #include "saleaeinterface.h"
-#define IAMHERE1 fprintf(stderr, "[%s:%d] Entering\n", __func__, __LINE__)
-#define IAMHERE2 fprintf(stderr, "[%s:%d] Exiting\n", __func__, __LINE__)
 
 void saleaeinterface_internal_on_connect(saleaeinterface_t *obj, unsigned int id)
 {
@@ -128,13 +126,13 @@ saleaeinterface_register_on_connect(obj, cb)
     SV* cb
         CODE:
             /* save a copy of the callback */
-            IAMHERE1;
+            IAMHERE_ENTRY;
             if (obj && !obj->on_connect) {
                 obj->on_connect = newSVsv(cb);
             } else {
                 SvSetSV((SV *)obj->on_connect, cb);
             }
-            IAMHERE2;
+            IAMHERE_EXIT;
 
 void
 saleaeinterface_register_on_disconnect(obj, cb)
@@ -142,13 +140,13 @@ saleaeinterface_register_on_disconnect(obj, cb)
     SV* cb
         CODE:
             /* save a copy of the callback */
-            IAMHERE1;
+            IAMHERE_ENTRY;
             if (obj && !obj->on_disconnect) {
                 obj->on_disconnect = newSVsv(cb);
             } else if (obj) {
                 SvSetSV((SV *)obj->on_disconnect, cb);
             }
-            IAMHERE2;
+            IAMHERE_EXIT;
 
 void
 saleaeinterface_register_on_readdata(obj, cb)
@@ -210,7 +208,7 @@ void
 saleaeinterface_DESTROY(obj)
     saleaeinterface_t *obj
     CODE:
-        IAMHERE1;
+        IAMHERE_ENTRY;
         if (obj) {
             SV* parent = obj->parent;
             SvREFCNT_dec(parent);
@@ -219,7 +217,7 @@ saleaeinterface_DESTROY(obj)
             free(obj);
             obj = NULL;
         }
-        IAMHERE2;
+        IAMHERE_EXIT;
 
 unsigned int
 saleaeinterface_is_usb2(obj, id)
