@@ -69,6 +69,9 @@ until ($done) {
         print "$subname: USB 2.0 is supported\n" if $sl->is_usb2($g_id);
         my $arr = $sl->get_supported_sample_rates($g_id);
         print "$subname: Supported sample rates: ", join(", ", @$arr), "\n";
+        $sl->set_sample_rate($g_id, $arr->[0]);
+        sleep 1;
+        print "$subname: Device sample rate is now: ", $sl->get_sample_rate($g_id), " Hz\n";
         $once++;
     }
 }
