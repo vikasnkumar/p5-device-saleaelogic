@@ -246,6 +246,30 @@ int saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj, U64 id,
     return 0;
 }
 
+unsigned int saleaeinterface_islogic16(saleaeinterface_t *obj, ID64 id)
+{
+    if (obj) {
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            return (type == SALEAEINTERFACE_LOGIC16) ? 1 : 0;
+        }
+    }
+    return 0;
+}
+
+unsigned int saleaeinterface_islogic(saleaeinterface_t *obj, ID64 id)
+{
+    if (obj) {
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, id);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            return (type == SALEAEINTERFACE_LOGIC) ? 1 : 0;
+        }
+    }
+    return 0;
+}
+
 #ifdef __cplusplus
 } /* extern C end */
 #endif /* __cplusplus */

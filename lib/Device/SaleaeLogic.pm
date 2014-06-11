@@ -93,6 +93,14 @@ sub get_supported_sample_rates {
     return saleaeinterface_get_supported_sample_rates($_[0]->{obj}, $_[1]);
 }
 
+sub is_logic16 {
+    return saleaeinterface_is_logic16($_[0]->{obj}, $_[1]);
+}
+
+sub is_logic {
+    return saleaeinterface_is_logic16($_[0]->{obj}, $_[1]);
+}
+
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;

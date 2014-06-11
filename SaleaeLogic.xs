@@ -249,3 +249,21 @@ saleaeinterface_get_supported_sample_rates(obj, id)
         }
     OUTPUT:
        RETVAL
+
+unsigned int
+saleaeinterface_is_logic16(obj, id)
+    saleaeinterface_t *obj
+    ID64 id
+    CODE:
+        RETVAL = saleaeinterface_islogic16(obj, id);
+    OUTPUT:
+        RETVAL
+
+unsigned int
+saleaeinterface_is_logic(obj, id)
+    saleaeinterface_t *obj
+    ID64 id
+    CODE:
+        RETVAL = saleaeinterface_islogic(obj, id);
+    OUTPUT:
+        RETVAL

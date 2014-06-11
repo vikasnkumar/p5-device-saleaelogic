@@ -11,6 +11,8 @@ can_ok($sl, 'set_sample_rate');
 can_ok($sl, 'is_usb2');
 can_ok($sl, 'is_streaming');
 can_ok($sl, 'get_supported_sample_rates');
+can_ok($sl, 'is_logic');
+can_ok($sl, 'is_logic16');
 undef $sl;
 
 done_testing();
