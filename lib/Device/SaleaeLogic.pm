@@ -70,27 +70,27 @@ sub DESTROY {
 }
 
 sub is_usb2 {
-    return saleaeinterface_is_usb2($_[0]->{obj});
+    return saleaeinterface_is_usb2($_[0]->{obj}, $_[1]);
 }
 
 sub is_streaming {
-    return saleaeinterface_is_streaming($_[0]->{obj});
+    return saleaeinterface_is_streaming($_[0]->{obj}, $_[1]);
 }
 
 sub get_channel_count {
-    return saleaeinterface_get_channel_count($_[0]->{obj});
+    return saleaeinterface_get_channel_count($_[0]->{obj}, $_[1]);
 }
 
 sub get_sample_rate {
-    return saleaeinterface_get_sample_rate($_[0]->{obj});
+    return saleaeinterface_get_sample_rate($_[0]->{obj}, $_[1]);
 }
 
 sub set_sample_rate {
-    saleaeinterface_set_sample_rate($_[0]->{obj}, $_[1]);
+    saleaeinterface_set_sample_rate($_[0]->{obj}, $_[1], $_[2]);
 }
 
 sub get_supported_sample_rates {
-    return saleaeinterface_get_supported_sample_rates($_[0]->{obj});
+    return saleaeinterface_get_supported_sample_rates($_[0]->{obj}, $_[1]);
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
