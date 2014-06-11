@@ -65,10 +65,6 @@ sub begin {
     saleaeinterface_begin_connect($_[0]->{obj});
 }
 
-sub end {
-    saleaeinterface_DESTROY($_[0]->{obj});
-}
-
 sub DESTROY {
     saleaeinterface_DESTROY($_[0]->{obj}) if $_[0]->{obj};
 }
