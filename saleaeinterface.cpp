@@ -207,11 +207,11 @@ static void cb_onerror(U64 id, void *udata)
         saleaeinterface_internal_on_error(obj, val);
     }
 }
-static void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
+void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
 {
     saleaeinterface_t *obj = (saleaeinterface_t *)udata;
     IAMHERE1;
-    if (obj) {
+    if (obj && iface) {
         int type = saleaeinterface_get_type(iface);
         /* setup the interface and device id */
         saleaeinterface_map_insert(obj->interface_map, id, iface);
@@ -219,6 +219,8 @@ static void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
         saleaeinterface_id_map_insert(obj->id_map, id,
                 saleaeinterface_runtime_device_count);
         obj->interface_count = saleaeinterface_map_size(obj->interface_map);
+        fprintf(stderr, "[%s:%d] Device id from SDK: %X from XS: %u\n",
+                __func__, __LINE__, id, saleaeinterface_runtime_device_count);
         if (type == SALEAEINTERFACE_LOGIC16) {
             Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(iface);
             l16->RegisterOnReadData(cb_onreaddata, udata);
@@ -232,9 +234,12 @@ static void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
         } else {
             fprintf(stderr, "[%s:%d] This is an unsupported device\n",
                     __func__, __LINE__);
+            IAMHERE2;
             return;
         }
         unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
+        fprintf(stderr, "[%s:%d] Device id from SDK: %X from XS: %u\n",
+                __func__, __LINE__, id, val);
         saleaeinterface_internal_on_connect(obj, val);
     }
     IAMHERE2;

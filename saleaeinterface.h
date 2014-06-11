@@ -13,6 +13,7 @@ enum {
 
 typedef struct {
     unsigned int begun;
+    void *perl;
     /* these are all SV* objects */
     void *parent;
     void *on_connect;
