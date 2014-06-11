@@ -13,7 +13,7 @@ can_ok($sl, 'is_streaming');
 can_ok($sl, 'get_supported_sample_rates');
 can_ok($sl, 'is_logic');
 can_ok($sl, 'is_logic16');
-can_ok($sl, 'get_sdk_id');
+can_ok($sl, 'get_device_id');
 undef $sl;
 
 done_testing();

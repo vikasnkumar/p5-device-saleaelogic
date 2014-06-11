@@ -101,7 +101,7 @@ sub is_logic {
     return saleaeinterface_is_logic16($_[0]->{obj}, $_[1]);
 }
 
-sub get_sdk_id {
+sub get_device_id {
     return saleaeinterface_sdk_id($_[0]->{obj}, $_[1]);
 }
 
