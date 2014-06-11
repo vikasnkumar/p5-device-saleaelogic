@@ -6,6 +6,8 @@
 
 #include "saleaeinterface.h"
 
+int saleaeinterface_internal_verbosity = 0;
+
 void saleaeinterface_internal_on_connect(saleaeinterface_t *obj, unsigned int id)
 {
     if (!obj || !obj->perl)
@@ -286,7 +288,8 @@ saleaeinterface_get_supported_sample_rates(obj, id)
         outlen = saleaeinterface_getsupportedsamplerates(obj, id, buf, blen);
         if (outlen > 0) {
             for (i = 0; i < outlen && i < blen; ++i) {
-                fprintf(stderr, "[%s:%d] sample[%d]: %u\n", __func__, __LINE__, i, buf[i]);
+                if (saleaeinterface_internal_verbosity)
+                    fprintf(stderr, "[%s:%d] sample[%d]: %u\n", __func__, __LINE__, i, buf[i]);
                 av_push(results, newSVuv(buf[i]));
             }
         }
@@ -340,3 +343,8 @@ saleaeinterface_get_device_id(obj, id)
         }
     OUTPUT:
         RETVAL
+
+void
+saleaeinterface_verbose()
+    CODE:
+        saleaeinterface_internal_verbosity = 1;

@@ -38,6 +38,9 @@ sub new {
 	my $class = ref($self) || $self;
     my %args = @_;
     my $this = bless({%args}, $class);
+    if ($args{verbose} or $args{debug}) {
+        saleaeinterface_verbose();
+    }
     my $obj = saleaeinterface_new($this);
     $this->{obj} = $obj;
     if (exists $args{on_connect} and ref $args{on_connect} eq 'CODE') {

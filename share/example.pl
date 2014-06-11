@@ -53,6 +53,7 @@ my $sl = Device::SaleaeLogic->new(
             on_error => \&on_error,
             on_readdata => \&on_readdata,
             on_writedata => \&on_writedata,
+            verbose => 1,
         );
 $sl->begin;
 

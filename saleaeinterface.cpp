@@ -168,7 +168,8 @@ static int saleaeinterface_get_type(GenericInterface *iface)
     if (!iface)
         return SALEAEINTERFACE_UNKNOWN;
     std::string iface_name = typeid(*iface).name();
-    fprintf(stderr, "[%s:%d] Interface name: %s\n",
+    if (saleaeinterface_internal_verbosity)
+        fprintf(stderr, "[%s:%d] Interface name: %s\n",
             __func__, __LINE__, iface_name.c_str());
     if (iface_name.find("Logic16Interface") != std::string::npos) {
         return SALEAEINTERFACE_LOGIC16;
@@ -217,7 +218,8 @@ void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
         saleaeinterface_id_map_insert(obj->id_map, id,
                 saleaeinterface_runtime_device_count);
         obj->interface_count = saleaeinterface_map_size(obj->interface_map);
-        fprintf(stderr, "[%s:%d] Device id from SDK: %X from XS: %u\n",
+        if (saleaeinterface_internal_verbosity)
+            fprintf(stderr, "[%s:%d] Device id from SDK: %X from XS: %u\n",
                 __func__, __LINE__, id, saleaeinterface_runtime_device_count);
         if (type == SALEAEINTERFACE_LOGIC16) {
             Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(iface);
@@ -230,13 +232,15 @@ void cb_onconnect(U64 id, GenericInterface *iface, void *udata)
             l8->RegisterOnWriteData(cb_onwritedata, udata);
             l8->RegisterOnError(cb_onerror, udata);
         } else {
-            fprintf(stderr, "[%s:%d] This is an unsupported device\n",
+            if (saleaeinterface_internal_verbosity)
+                fprintf(stderr, "[%s:%d] This is an unsupported device\n",
                     __func__, __LINE__);
             IAMHERE_EXIT;
             return;
         }
         unsigned int val = saleaeinterface_id_map_get(obj->id_map, id);
-        fprintf(stderr, "[%s:%d] Device id from SDK: %X from XS: %u\n",
+        if (saleaeinterface_internal_verbosity)
+            fprintf(stderr, "[%s:%d] Device id from SDK: %X from XS: %u\n",
                 __func__, __LINE__, id, val);
         saleaeinterface_internal_on_connect(obj, val);
     }
