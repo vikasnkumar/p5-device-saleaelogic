@@ -1,4 +1,11 @@
 use 5.010001;
+use Config qw/%Config/;
+
+die 'No support for OS' unless $^O =~ /linux|darwin|mswin32/i;
+
+die 'No support for OS' if ($Config{archname} =~ /x64|x86_64/ and $^O =~ /darwin|mswin32/i);
+die 'No support for OS' if ($Config{ptrsize} eq 8 and $^O =~ /darwin|mswin32/i);
+
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 
@@ -8,7 +15,7 @@ install_share 'share';
 my $SUFF = '';
 $SUFF = 'lib' if $^O =~ /linux|darwin/i;
 my $otherldflags = '';
-$otherldflags = '-m32' if $^O =~ /darwin|mswin32|cygwin/i;
+$otherldflags = '-m32' if $^O =~ /darwin|mswin32/i;
 WriteMakefile(
     NAME              => 'Device::SaleaeLogic',
     VERSION_FROM      => 'lib/Device/SaleaeLogic.pm', # finds $VERSION
@@ -50,7 +57,7 @@ SaleaeDeviceApi.h :: pm_to_blib
 \tcp -v \$(INST_DYNAMIC_DEP) \$(INST_ARCHAUTODIR)
 \tcp -v \$(INST_DYNAMIC_DEP) \$(INST_LIB)
 SDK_INST
-    push @ret, $code if $^O =~ /linux|darwin|cygwin/i;
+    push @ret, $code if $^O =~ /linux|darwin/i;
     return join "\n", @ret;
 }
 
