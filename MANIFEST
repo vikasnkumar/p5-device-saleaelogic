@@ -2,6 +2,7 @@ Changes
 getSDK.PL
 lib/Device/SaleaeLogic.pm
 libSaleaeDevice.so
+LICENSE
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -11,5 +12,7 @@ SaleaeDeviceApi.h
 saleaeinterface.cpp
 saleaeinterface.h
 SaleaeLogic.xs
+share/99-SaleaeLogic.rules
+share/example.pl
 t/Device-SaleaeLogic.t
 typemap

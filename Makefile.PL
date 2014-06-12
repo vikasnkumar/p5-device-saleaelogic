@@ -32,7 +32,7 @@ WriteMakefile(
     OBJECT            => 'SaleaeLogic.o saleaeinterface.o', # link all the C files too
     ### we are doing this so that the header files needed are downloaded first
     #and the make file dependencies are managed appropriately
-    PL_FILES          => { 'getSDK.PL' => 'SaleaeDeviceApi.h' },
+    PL_FILES          => { 'getSDK.PL' => '$(H_FILES)' },
     dynamic_lib       => { INST_DYNAMIC_DEP => "${SUFF}SaleaeDevice.\$(DLEXT)" },
 );
 
@@ -55,6 +55,13 @@ sub const_loadlibs {
     my $self = shift;
     my @ret = $self->SUPER::const_loadlibs();
     push @ret, 'BSLOADLIBS = -L$(INST_LIBDIR) -L$(INST_ARCHLIBDIR) -L$(INST_AUTODIR) -L$(INST_ARCHAUTODIR) -lSaleaeDevice';
+    return join "\n", @ret;
+}
+
+sub post_constants {
+    my $self = shift;
+    my @ret = $self->SUPER::post_constants();
+    push @ret, '$(H_FILES) = $(H_FILES) SaleaeDeviceApi.h';
     return join "\n", @ret;
 }
 
