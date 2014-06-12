@@ -1,5 +1,5 @@
 use Test::More;
-if ($^O =~ /linux/i) {
+if ($^O =~ /linux|darwin/i) {
     plan skip_all => "Linux SDK API has problems";
 }
 use_ok('Device::SaleaeLogic');

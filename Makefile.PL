@@ -33,7 +33,7 @@ WriteMakefile(
     ### we are doing this so that the header files needed are downloaded first
     #and the make file dependencies are managed appropriately
     PL_FILES          => { 'getSDK.PL' => '$(H_FILES)' },
-    dynamic_lib       => { INST_DYNAMIC_DEP => "${SUFF}SaleaeDevice.\$(DLEXT)" },
+    dynamic_lib       => { INST_DYNAMIC_DEP => "${SUFF}SaleaeDevice.\$(SO)" },
 );
 
 package MY;
