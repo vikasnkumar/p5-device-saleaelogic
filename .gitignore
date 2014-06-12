@@ -8,7 +8,7 @@ SaleaeLogic.c
 SaleaeLogic.o
 _installer/
 blib/
-libSaleaeDevice.so
+libSaleaeDevice.*
 pm_to_blib
 saleaeinterface.o
 saleaesdk.zip
