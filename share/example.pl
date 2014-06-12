@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use blib;
-use Data::Dumper;
 use Device::SaleaeLogic;
 
 my $done = 0;
@@ -23,6 +22,9 @@ sub on_connect {
     print "$subname: USB 2.0 is supported\n" if $self->is_usb2($id);
     my $arr = $self->get_supported_sample_rates($id);
     print "$subname: Supported sample rates: ", join(", ", @$arr), "\n";
+    $arr = $self->get_active_channels($id);
+    print "$subname: Active channels: ", join(", ", @$arr), "\n";
+    print "$subname: Use 5 Volts: ", $self->get_use5volts($id), "\n";
 }
 
 sub on_disconnect {
@@ -40,6 +42,15 @@ sub on_readdata {
     my ($self, $id, $data, $len) = @_;
     my $subname = 'on_readdata';
     print "$subname: Device with id: $id reads data of length $len\n";
+    if ($len > 0) {
+        use bytes;
+        print "Length: ", length($data), " from perl and given $len\n";
+        return;
+        for (my $i = 0; $i < length($data); ++$i) {
+            printf "%02X", hex(substr($data, $i, 1));
+            print "\n" if $i % 32 == 0;
+        }
+    }
 }
 sub on_writedata {
     my ($self, $id, $data, $len) = @_;
@@ -58,6 +69,8 @@ my $sl = Device::SaleaeLogic->new(
 $sl->begin;
 
 my $once = 0;
+my $read_once = 0;
+my $t1 = time;
 until ($done) {
     sleep 5;
     if ($g_id > 0 and not $once) {
@@ -73,7 +86,27 @@ until ($done) {
         $sl->set_sample_rate($g_id, $arr->[0]);
         sleep 1;
         print "$subname: Device sample rate is now: ", $sl->get_sample_rate($g_id), " Hz\n";
-        $once++;
+        $arr = $sl->get_active_channels($g_id);
+        print "$subname: Active channels: ", join(", ", @$arr), "\n";
+        print "$subname: Use 5 Volts: ", $sl->get_use5volts($g_id), "\n";
+        $once++; # once is 1
+    }
+    my $t2 = time;
+    if ($g_id > 0 and ($t2 - $t1) > 10) {
+        unless ($sl->is_streaming($g_id)) {
+            if (not $read_once) {
+                $sl->read_start($g_id);
+                print "Starting Read\n";
+            }
+        }
+        if (($t2 - $t1) > 30) {
+            if ($sl->is_streaming($g_id)) {
+                $sl->stop($g_id);
+                print "Stopping Read\n";
+                $t1 = time;
+                $read_once++; # read_once is 1
+            }
+        }
     }
 }
 print "Done\n";

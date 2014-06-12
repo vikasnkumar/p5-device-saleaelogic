@@ -375,6 +375,167 @@ unsigned int saleaeinterface_islogic(saleaeinterface_t *obj, unsigned int id)
     return 0;
 }
 
+/* pass in an array of channel indexes and the number of channels */
+void saleaeinterface_setactivechannels(saleaeinterface_t *obj, unsigned int id,
+                                unsigned int *channels, unsigned int count)
+{
+    if (obj) {
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            if (type == SALEAEINTERFACE_LOGIC16) {
+                Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(gi);
+                if (channels && count > 0) {
+                    l16->SetActiveChannels(channels, count);
+                }
+            } else {
+                if (saleaeinterface_internal_verbosity) {
+                    fprintf(stderr, "[%s:%d] SetActiveChannels() only works for Logic16\n",
+                            __func__, __LINE__);
+                }
+            }
+        }
+    }
+}
+/* user has to pass in an array of at least 16 elements */
+unsigned int saleaeinterface_getactivechannels(saleaeinterface_t *obj, unsigned int id,
+                                unsigned int *channels, unsigned int count)
+{
+    if (obj) {
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            if (type == SALEAEINTERFACE_LOGIC16) {
+                Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(gi);
+                if (count < 16) {
+                    if (saleaeinterface_internal_verbosity) {
+                        fprintf(stderr, "[%s:%d] GetActiveChannels() needs an "
+                                "array of minimum 16 elements\n",
+                                __func__, __LINE__);
+                    }
+                    return 0;
+                } else {
+                    return l16->GetActiveChannels(channels);
+                }
+            } else {
+                if (saleaeinterface_internal_verbosity) {
+                    fprintf(stderr, "[%s:%d] GetActiveChannels() only works for Logic16\n",
+                            __func__, __LINE__);
+                }
+            }
+        }
+    }
+    return 0;
+}
+void saleaeinterface_setuse5volts(saleaeinterface_t *obj, unsigned int id, int flag)
+{
+    if (obj) {
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            if (type == SALEAEINTERFACE_LOGIC16) {
+                Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(gi);
+                l16->SetUse5Volts(flag ? true : false);
+            } else {
+                if (saleaeinterface_internal_verbosity) {
+                    fprintf(stderr, "[%s:%d] SetUse5Volts() only works for Logic16\n",
+                            __func__, __LINE__);
+                }
+            }
+        }
+    }
+}
+int saleaeinterface_getuse5volts(saleaeinterface_t *obj, unsigned int id)
+{
+    if (obj) {
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            if (type == SALEAEINTERFACE_LOGIC16) {
+                Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(gi);
+                return l16->GetUse5Volts() ? 1 : 0;
+            } else {
+                if (saleaeinterface_internal_verbosity) {
+                    fprintf(stderr, "[%s:%d] GetUse5Volts() only works for Logic16\n",
+                            __func__, __LINE__);
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+void saleaeinterface_read_start(saleaeinterface_t *obj, unsigned int id)
+{
+    if (obj) {
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            if (type == SALEAEINTERFACE_LOGIC16) {
+                Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(gi);
+                l16->ReadStart();
+            } else if (type == SALEAEINTERFACE_LOGIC) {
+                LogicInterface *l8 = dynamic_cast<LogicInterface *>(gi);
+                l8->ReadStart();
+            } else {
+                if (saleaeinterface_internal_verbosity) {
+                    fprintf(stderr, "[%s:%d] Device is neither Logic16 or Logic.\n",
+                            __func__, __LINE__);
+                }
+            }
+        }
+    }
+}
+
+void saleaeinterface_stop(saleaeinterface_t *obj, unsigned int id)
+{
+    if (obj) {
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            if (type == SALEAEINTERFACE_LOGIC16) {
+                Logic16Interface *l16 = dynamic_cast<Logic16Interface *>(gi);
+                l16->Stop();
+            } else if (type == SALEAEINTERFACE_LOGIC) {
+                LogicInterface *l8 = dynamic_cast<LogicInterface *>(gi);
+                l8->Stop();
+            } else {
+                if (saleaeinterface_internal_verbosity) {
+                    fprintf(stderr, "[%s:%d] Device is neither Logic16 or Logic.\n",
+                            __func__, __LINE__);
+                }
+            }
+        }
+    }
+}
+
+void saleaeinterface_write_start(saleaeinterface_t *obj, unsigned int id)
+{
+    if (obj) {
+        U64 did = saleaeinterface_id_map_get_id(obj->id_map, id);
+        GenericInterface *gi = saleaeinterface_map_get(obj->interface_map, did);
+        if (gi) {
+            int type = saleaeinterface_get_type(gi);
+            if (type == SALEAEINTERFACE_LOGIC) {
+                LogicInterface *l8 = dynamic_cast<LogicInterface *>(gi);
+                l8->WriteStart();
+            } else {
+                if (saleaeinterface_internal_verbosity) {
+                    fprintf(stderr,
+                            "[%s:%d] WriteStart() is supported only for Logic.\n",
+                            __func__, __LINE__);
+                }
+            }
+        }
+    }
+}
+
 size_t saleaeinterface_get_sdk_id(saleaeinterface_t *obj, unsigned int id,
             char *buf, size_t buflen)
 {

@@ -108,6 +108,35 @@ sub get_device_id {
     return saleaeinterface_get_device_id($_[0]->{obj}, $_[1]);
 }
 
+sub read_start {
+    saleaeinterface_read_start($_[0]->{obj}, $_[1]);
+}
+
+sub write_start {
+    saleaeinterface_write_start($_[0]->{obj}, $_[1]);
+}
+
+sub stop {
+    saleaeinterface_stop($_[0]->{obj}, $_[1]);
+}
+
+sub set_use5volts {
+    saleaeinterface_set_use5volts($_[0]->{obj}, $_[1], $_[2] ? 1 : 0);
+}
+
+sub get_use5volts {
+    return saleaeinterface_get_use5volts($_[0]->{obj}, $_[1]);
+}
+
+sub get_active_channels {
+    return saleaeinterface_get_active_channels($_[0]->{obj}, $_[1]);
+}
+
+sub set_active_channels {
+    return unless ref $_[2] eq 'ARRAY';
+    saleaeinterface_set_active_channels($_[0]->{obj}, $_[1], $_[2]);
+}
+
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;

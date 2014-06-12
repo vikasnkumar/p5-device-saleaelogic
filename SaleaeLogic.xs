@@ -31,7 +31,7 @@ void saleaeinterface_internal_on_disconnect(saleaeinterface_t *obj, unsigned int
     if (!obj || !obj->perl)
         return;
     PERL_SET_CONTEXT(obj->perl);
-    if (obj && SvOK((SV *)obj->parent) && SvOK((SV *)obj->on_disconnect)) {
+    if (SvOK((SV *)obj->parent) && SvOK((SV *)obj->on_disconnect)) {
         dSP;
         ENTER;
         SAVETMPS;
@@ -49,7 +49,7 @@ void saleaeinterface_internal_on_error(saleaeinterface_t *obj, unsigned int id)
     if (!obj || !obj->perl)
         return;
     PERL_SET_CONTEXT(obj->perl);
-    if (obj && SvOK((SV *)obj->parent) && SvOK((SV *)obj->on_error)) {
+    if (SvOK((SV *)obj->parent) && SvOK((SV *)obj->on_error)) {
         dSP;
         ENTER;
         SAVETMPS;
@@ -73,13 +73,9 @@ void saleaeinterface_internal_on_readdata(saleaeinterface_t *obj, unsigned int i
         ENTER;
         SAVETMPS;
         PUSHMARK(SP);
-        SV *psv = newSV(0);
-        SvPVX(psv) = data;
-        SvCUR(psv) = len;
-        SvLEN(psv) = 0;
         XPUSHs((SV *)obj->parent);
         XPUSHs(sv_2mortal(newSVuv(id)));
-        XPUSHs(psv);
+        XPUSHs(sv_2mortal(newSVpvn(data, len)));
         XPUSHs(sv_2mortal(newSVuv(len)));
         PUTBACK;
         call_sv((SV *)obj->on_readdata, G_DISCARD);
@@ -279,7 +275,7 @@ saleaeinterface_get_supported_sample_rates(obj, id)
     CODE:
         buf = malloc(blen * sizeof(unsigned int));
         if (!buf) {
-            Perl_croak(aTHX_ "No memory to allocate 16 array of integers\n");
+            Perl_croak(aTHX_ "No memory to allocate 32 array of integers\n");
             XSRETURN_UNDEF;
         } else {
             memset(buf, 0, blen * sizeof(unsigned int));
@@ -348,3 +344,111 @@ void
 saleaeinterface_verbose()
     CODE:
         saleaeinterface_internal_verbosity = 1;
+
+void
+saleaeinterface_read_start(obj, id)
+    saleaeinterface_t *obj
+    unsigned int id
+    CODE:
+        saleaeinterface_read_start(obj, id);
+
+void
+saleaeinterface_write_start(obj, id)
+    saleaeinterface_t *obj
+    unsigned int id
+    CODE:
+        saleaeinterface_write_start(obj, id);
+
+void
+saleaeinterface_stop(obj, id)
+    saleaeinterface_t *obj
+    unsigned int id
+    CODE:
+        saleaeinterface_stop(obj, id);
+
+void
+saleaeinterface_set_use5volts(obj, id, flag)
+    saleaeinterface_t *obj
+    unsigned int id
+    unsigned int flag
+    CODE:
+        saleaeinterface_setuse5volts(obj, id, flag);
+
+int
+saleaeinterface_get_use5volts(obj, id)
+    saleaeinterface_t *obj
+    unsigned int id
+    CODE:
+        RETVAL = saleaeinterface_getuse5volts(obj, id);
+    OUTPUT:
+        RETVAL
+
+SV *
+saleaeinterface_get_active_channels(obj, id)
+    saleaeinterface_t *obj
+    unsigned int id
+    PREINIT:
+        AV *results;
+        unsigned int *buf = NULL;
+        unsigned int blen = 16;
+        int outlen = 0;
+        int i = 0;
+    CODE:
+        buf = malloc(blen * sizeof(unsigned int));
+        if (!buf) {
+            Perl_croak(aTHX_ "No memory to allocate 16 array of integers\n");
+            XSRETURN_UNDEF;
+        } else {
+            memset(buf, 0, blen * sizeof(unsigned int));
+        }
+        results = newAV();
+        outlen = saleaeinterface_getactivechannels(obj, id, buf, blen);
+        if (outlen > 0) {
+            for (i = 0; i < outlen && i < blen; ++i) {
+                if (saleaeinterface_internal_verbosity) {
+                    fprintf(stderr, "[%s:%d] channel[%d]: %u\n",
+                        __func__, __LINE__, i, buf[i]);
+                }
+                av_push(results, newSVuv(buf[i]));
+            }
+        }
+        RETVAL = newRV_noinc((SV *)results);
+        if (buf) {
+            free(buf);
+        }
+    OUTPUT:
+       RETVAL
+
+void
+saleaeinterface_set_active_channels(obj, id, chnls)
+    saleaeinterface_t *obj
+    unsigned int id
+    SV* chnls
+    PREINIT:
+        AV *channels;
+        unsigned int *buf = NULL;
+        unsigned int blen = 0;
+        int i = 0;
+        if ((!SvROK(chnls)) || (SvTYPE(SvRV(chnls)) != SVt_PVAV) ||
+            ((blen = av_len((AV *)SvRV(chnls)))) <= 0) {
+            XSRETURN_UNDEF;
+        }
+    CODE:
+        buf = malloc(blen * sizeof(unsigned int));
+        if (!buf) {
+            Perl_croak(aTHX_ "No memory to allocate %u array of integers\n", blen);
+            XSRETURN_UNDEF;
+        } else {
+            memset(buf, 0, blen * sizeof(unsigned int));
+        }
+        for (i = 0; i < blen; ++i) {
+            buf[i] = SvUV(*av_fetch((AV *)SvRV(chnls), i, 0));
+            if (saleaeinterface_internal_verbosity) {
+                fprintf(stderr, "[%s:%d] channel[%d]: %u\n",
+                        __func__, __LINE__, i, buf[i]);
+            }
+        }
+        saleaeinterface_setactivechannels(obj, id, buf, blen);
+        if (buf) {
+            free(buf);
+        }

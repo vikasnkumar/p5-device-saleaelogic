@@ -48,11 +48,20 @@ unsigned int saleaeinterface_isstreaming(saleaeinterface_t *obj, unsigned int id
 unsigned int saleaeinterface_isusb2(saleaeinterface_t *obj, unsigned int id);
 unsigned int saleaeinterface_getchannelcount(saleaeinterface_t *obj, unsigned int id);
 unsigned int saleaeinterface_getsamplerate(saleaeinterface_t *obj, unsigned int id);
+void saleaeinterface_read_start(saleaeinterface_t *obj, unsigned int id);
+void saleaeinterface_stop(saleaeinterface_t *obj, unsigned int id);
+void saleaeinterface_write_start(saleaeinterface_t *obj, unsigned int id);
+/* pass in an array of channel indexes and the number of channels */
+void saleaeinterface_setactivechannels(saleaeinterface_t *obj, unsigned int id, unsigned int *channels, unsigned int count);
+/* user has to pass in an array of at least 16 elements */
+unsigned int saleaeinterface_getactivechannels(saleaeinterface_t *obj, unsigned int id, unsigned int *channels, unsigned int count);
+void saleaeinterface_setuse5volts(saleaeinterface_t *obj, unsigned int id, int flag);
+int saleaeinterface_getuse5volts(saleaeinterface_t *obj, unsigned int id);
 void saleaeinterface_setsamplerate(saleaeinterface_t *obj, unsigned int id, unsigned int rate);
 /* the user has to alloc the ptr variable and give it to the function */
 int saleaeinterface_getsupportedsamplerates(saleaeinterface_t *obj, unsigned int id,
                             unsigned int *ptr, unsigned int len);
-
+/* user has to allocate buf and pass it in */
 size_t saleaeinterface_get_sdk_id(saleaeinterface_t *obj, unsigned int id,
             char *buf, size_t buflen);
 
