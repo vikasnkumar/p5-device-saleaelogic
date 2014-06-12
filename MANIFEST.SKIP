@@ -13,3 +13,5 @@ _installer
 \.swp$
 \.gitignore$
 \.git
+\.bso
+libSaleaeDevice.*

@@ -1,7 +1,6 @@
 Changes
 getSDK.PL
 lib/Device/SaleaeLogic.pm
-libSaleaeDevice.so
 LICENSE
 Makefile.PL
 MANIFEST

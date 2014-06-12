@@ -14,4 +14,4 @@ saleaeinterface.o
 saleaesdk.zip
 *.bak
 *.old
-
+*.bso
