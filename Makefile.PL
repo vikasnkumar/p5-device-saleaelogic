@@ -7,6 +7,8 @@ install_share 'share';
 # the contents of the Makefile that is written.
 my $SUFF = '';
 $SUFF = 'lib' if $^O =~ /linux|darwin/i;
+my $otherldflags = '';
+$otherldflags = '-m32' if $^O =~ /darwin|mswin32|cygwin/i;
 WriteMakefile(
     NAME              => 'Device::SaleaeLogic',
     VERSION_FROM      => 'lib/Device/SaleaeLogic.pm', # finds $VERSION
@@ -28,12 +30,13 @@ WriteMakefile(
     LIBS              => ['-L. -lSaleaeDevice'], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
+    CCFLAGS           => $otherldflags,
 	# Un-comment this if you add C files to link with later:
     OBJECT            => 'SaleaeLogic.o saleaeinterface.o', # link all the C files too
     ### we are doing this so that the header files needed are downloaded first
     #and the make file dependencies are managed appropriately
     PL_FILES          => { 'getSDK.PL' => '$(H_FILES)' },
-    dynamic_lib       => { INST_DYNAMIC_DEP => "${SUFF}SaleaeDevice.\$(SO)" },
+    dynamic_lib       => { OTHERLDFLAGS => $otherldflags , INST_DYNAMIC_DEP => "${SUFF}SaleaeDevice.\$(SO)" },
 );
 
 package MY;
