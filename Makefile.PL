@@ -25,7 +25,7 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Device/SaleaeLogic.pm', # retrieve abstract from module
        AUTHOR         => 'Vikas Kumar <vikas@selectiveintellect.com>') : ()),
-    LIBS              => ['-L$(INST_ARCHAUTODIR) -L. -lSaleaeDevice'], # e.g., '-lm'
+    LIBS              => ['-L. -lSaleaeDevice'], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:
@@ -48,6 +48,13 @@ SaleaeDeviceApi.h :: pm_to_blib
 \tcp -v \$(INST_DYNAMIC_DEP) \$(INST_LIB)
 SDK_INST
     push @ret, $code;
+    return join "\n", @ret;
+}
+
+sub const_loadlibs {
+    my $self = shift;
+    my @ret = $self->SUPER::const_loadlibs();
+    push @ret, 'BSLOADLIBS = -L$(INST_LIBDIR) -L$(INST_ARCHLIBDIR) -L$(INST_AUTODIR) -L$(INST_ARCHAUTODIR) -lSaleaeDevice';
     return join "\n", @ret;
 }
 

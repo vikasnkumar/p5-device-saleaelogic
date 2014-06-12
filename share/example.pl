@@ -32,6 +32,9 @@ sub on_disconnect {
     my $subname = 'on_disconnect';
     print "$subname: Device with id: $id disconnected\n";
     $done = 1;
+    if ($self->is_streaming($id)) {
+        $self->stop($id);
+    }
 }
 sub on_error {
     my ($self, $id) = @_;
