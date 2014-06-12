@@ -47,7 +47,7 @@ SaleaeDeviceApi.h :: pm_to_blib
 \tcp -v \$(INST_DYNAMIC_DEP) \$(INST_ARCHAUTODIR)
 \tcp -v \$(INST_DYNAMIC_DEP) \$(INST_LIB)
 SDK_INST
-    push @ret, $code;
+    push @ret, $code if $^O =~ /linux|darwin|cygwin/i;
     return join "\n", @ret;
 }
 
