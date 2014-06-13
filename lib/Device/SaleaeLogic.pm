@@ -144,7 +144,7 @@ __END__
 
 =head1 NAME
 
-Device::SaleaeLogic - Perl extension for blah blah blah
+Device::SaleaeLogic - Perl extension for accessing the Logic or Logic16 devices made by Saleae Logic.
 
 =head1 VERSION
 
