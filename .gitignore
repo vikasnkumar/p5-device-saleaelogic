@@ -15,3 +15,5 @@ saleaesdk.zip
 *.bak
 *.old
 *.bso
+.*.swp
+Device-SaleaeLogic-*gz
