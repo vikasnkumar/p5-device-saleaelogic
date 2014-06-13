@@ -65,7 +65,12 @@ will also print all the device information on screen.
 
 This example demonstrates how to use the API.
 
-#Contributors
+#LINUX UDEV RULES
+
+We provide a sample `udev` rule for Linux in the file
+`share/99-SaleaeLogic.rules`.
+
+#CONTRIBUTORS
 
 - Vikas N Kumar [@vikasnkumar](https://github.com/vikasnkumar/)
 
