@@ -6,7 +6,7 @@
 
 #include "saleaeinterface.h"
 
-int saleaeinterface_internal_verbosity = 0;
+volatile int saleaeinterface_internal_verbosity = 0;
 
 void saleaeinterface_internal_on_connect(saleaeinterface_t *obj, unsigned int id)
 {

@@ -32,7 +32,7 @@ typedef std::pair <U64, GenericInterface *> SIPair;
 typedef std::map <U64, unsigned int> SIDMap;
 typedef std::pair <U64, unsigned int> SIDPair;
 
-static unsigned int saleaeinterface_runtime_device_count = 0;
+static volatile unsigned int saleaeinterface_runtime_device_count = 0;
 /* interface for XS to call */
 void *saleaeinterface_map_create()
 {
