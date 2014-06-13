@@ -15,3 +15,5 @@ _installer
 \.git
 \.bso
 libSaleaeDevice.*
+\.tar\.gz$
+\.tgz$

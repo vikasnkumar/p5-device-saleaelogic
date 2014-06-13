@@ -7,6 +7,7 @@ MANIFEST
 MANIFEST.SKIP
 ppport.h
 README
+README.md
 SaleaeDeviceApi.h
 saleaeinterface.cpp
 saleaeinterface.h

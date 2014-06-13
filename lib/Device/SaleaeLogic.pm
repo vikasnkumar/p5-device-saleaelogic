@@ -141,53 +141,69 @@ sub set_active_channels {
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
 Device::SaleaeLogic - Perl extension for blah blah blah
 
+=head1 VERSION
+
+0.02
+
 =head1 SYNOPSIS
 
+  use strict;
+  use warnings;
   use Device::SaleaeLogic;
-  blah blah blah
+
+  my $obj = Device::SaleaeLogic->new(
+                on_connect => sub {
+                    my ($self, $id) = @_;
+                    #... do something here #
+                },
+                on_disconnect => sub {
+                    my ($self, $id) = @_;
+                    #... do something here #
+                },
+                on_readdata => sub {
+                    my ($self, $id, $data, $len) = @_;
+                    if ($len > 0) {
+                        use bytes;
+                        print "length: ", length($data), "\n";
+                        print "length: $len\n";
+                    }
+                },
+                on_error => sub {
+                    my ($self, $id) = @_;
+                },
+                verbose => 1,
+            );
+  ##... have an event loop here or something ...
 
 =head1 DESCRIPTION
-
-Stub documentation for Device::SaleaeLogic, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
 
 =head2 EXPORT
 
 None by default.
 
-
-
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+The github repository is at
+L<https://github.com/vikasnkumar/p5-device-saleaelogic>. Feel free to provide us
+patches.
 
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
+Find me on IRC: I<#hardware> on L<irc://irc.perl.org> as user name B<vicash>.
 
 =head1 AUTHOR
 
-Vikas Kumar, E<lt>vikas@selectiveintellect.comE<gt>
+Vikas Kumar, E<lt>vikas@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2014 by Vikas Kumar
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.1 or,
-at your option, any later version of Perl 5 you may have available.
+This library is under the MIT license. Please refer the LICENSE file for more
+information provided with the distribution.
 
 
 =cut
